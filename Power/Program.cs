@@ -99,7 +99,7 @@ namespace IngameScript
             GridTerminalSystem.GetBlocksOfType<IMySolarPanel>(sps);
             GridTerminalSystem.GetBlocksOfType<IMyPowerProducer>(pps);
             List<string> fs = new List<string>();
-            Dictionary<IMyCubeGrid, float> grids = new Dictionary<IMyCubeGrid, float>();
+            Dictionary<IMyCubeGrid, GridPowerSum> grids = new Dictionary<IMyCubeGrid, GridPowerSum>();
 
             foreach (var sp in pps)
             {
@@ -114,14 +114,16 @@ namespace IngameScript
             foreach (var b in bats)
             {
                 if (!grids.ContainsKey(b.CubeGrid))
-                    grids.Add(b.CubeGrid, 0);
-                grids[b.CubeGrid] += b.CurrentStoredPower;
+                    grids.Add(b.CubeGrid, new GridPowerSum());
+                grids[b.CubeGrid].Current += b.CurrentStoredPower;
+                grids[b.CubeGrid].Max += b.MaxStoredPower;
+
                 output += b.CurrentOutput;
             }
 
             foreach (var g in grids.Keys)
             {
-                fs.Add(g.CustomName + ": " + (grids[g] * 1000).ToString("0") + " kWh");
+                fs.Add($"{g.CustomName}: {(grids[g].Current * 1000).ToString("0")} kWh / {(grids[g].Max * 1000).ToString("0")} kWh\t {grids[g].Perc.ToString("F1")}%");
             }
             //string s = String.Join("\n",fs);   
             //lcd.WriteText(s);
@@ -162,6 +164,13 @@ namespace IngameScript
             return (f * 1000).ToString("0.##") + " kW";
         }
 
+        private class GridPowerSum
+        {
+            public float Current = 0;
+
+            public float Max = 0;
+            public float Perc => (Current / Max) * 100f;
+        }
     }
 }
 
