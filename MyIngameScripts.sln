@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{A6EFC1AD-C283-46EF-870F-F9021AE4D05D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoShipPatrol", "AutoShipPatrol\AutoShipPatrol.csproj", "{68BCED65-2996-465D-A78A-86378637BD7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CargoCapacity", "CargoCapacity\CargoCapacity.csproj", "{45F4F5C4-19D5-4B48-882F-87E2056C2E3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -48,6 +52,10 @@ Global
 		{16A051A2-0BF1-4931-A6B2-28564621817B}.Debug|x64.Build.0 = Debug|x64
 		{A6EFC1AD-C283-46EF-870F-F9021AE4D05D}.Debug|x64.ActiveCfg = Debug|x64
 		{A6EFC1AD-C283-46EF-870F-F9021AE4D05D}.Debug|x64.Build.0 = Debug|x64
+		{68BCED65-2996-465D-A78A-86378637BD7A}.Debug|x64.ActiveCfg = Debug|x64
+		{68BCED65-2996-465D-A78A-86378637BD7A}.Debug|x64.Build.0 = Debug|x64
+		{45F4F5C4-19D5-4B48-882F-87E2056C2E3C}.Debug|x64.ActiveCfg = Debug|x64
+		{45F4F5C4-19D5-4B48-882F-87E2056C2E3C}.Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
