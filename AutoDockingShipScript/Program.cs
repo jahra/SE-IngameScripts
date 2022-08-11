@@ -52,6 +52,7 @@ namespace IngameScript
         List<IMyThrust> thrusters = new List<IMyThrust>();
         IMyShipConnector conn;
         IMyRemoteControl remc;
+        IMyRadioAntenna ant;
 
         //IMyBroadcastListener myBroadcastListener;
         IMyUnicastListener myUnicastListener;
@@ -91,6 +92,11 @@ namespace IngameScript
             rems = rems.Where(r => Me.CubeGrid == r.CubeGrid).ToList();
             remc = rems.First();//Or setup by name
             //IMyRemoteControl remc = GridTerminalSystem.GetBlockWithName("Remote Control") as IMyRemoteControl;
+
+            List<IMyRadioAntenna> ants = new List<IMyRadioAntenna>();
+            GridTerminalSystem.GetBlocksOfType<IMyRadioAntenna>(ants);
+            ants = ants.Where(c => Me.CubeGrid == c.CubeGrid).ToList();
+            ant = ants.First();//Or specify connector on next line
 
             var s = Me.GetSurface(0);
             s.FontSize = 2;
@@ -173,6 +179,7 @@ namespace IngameScript
                     batts.ForEach(b => b.ChargeMode = undock ? ChargeMode.Auto : ChargeMode.Recharge);
                     gasTanks.ForEach(g => g.Enabled = undock);
                     thrusters.ForEach(t => t.Enabled = undock);
+                    ant.Enabled = undock;
                     LogMessage("thrusters: " + thrusters.Count.ToString());
                     if (undock)
                         conn.Disconnect();
