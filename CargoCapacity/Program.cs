@@ -49,7 +49,7 @@ namespace IngameScript
             {
                 List<IMyCockpit> cockpits = new List<IMyCockpit>();
                 GridTerminalSystem.GetBlocksOfType<IMyCockpit>(cockpits);
-                cockpit = cockpits.Where(x => Me.CubeGrid == x.CubeGrid).FirstOrDefault()?.GetSurface(COCKPIT_DISPLAY_INDEX);
+                cockpit = cockpits.Where(x => Me.CubeGrid == x.CubeGrid && x.SurfaceCount > 0).FirstOrDefault()?.GetSurface(COCKPIT_DISPLAY_INDEX);
                 cockpit.ContentType = ContentType.TEXT_AND_IMAGE;
             }
         }

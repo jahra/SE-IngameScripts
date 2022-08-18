@@ -180,7 +180,11 @@ namespace IngameScript
             lii.Add(new IngotInfo() { Name = "Ag", TypeName = "MyObjectBuilder_Ingot/Silver" });
             lii.Add(new IngotInfo() { Name = "Mg", TypeName = "MyObjectBuilder_Ingot/Magnesium" });
             lii.Add(new IngotInfo() { Name = "Au", TypeName = "MyObjectBuilder_Ingot/Gold" });
+            lii.Add(new IngotInfo() { Name = "U", TypeName = "MyObjectBuilder_Ingot/Uranium" });
+            lii.Add(new IngotInfo() { Name = "Pt", TypeName = "MyObjectBuilder_Ingot/Platinum" });
             lii.Add(new IngotInfo() { Name = "Ice", TypeName = "MyObjectBuilder_Ore/Ice" });
+
+
             return lii.ToArray();
         }
 
@@ -194,6 +198,9 @@ namespace IngameScript
             lii.Add(new IngotInfo() { Name = "Ag", TypeName = "MyObjectBuilder_Ore/Silver" });
             lii.Add(new IngotInfo() { Name = "Mg", TypeName = "MyObjectBuilder_Ore/Magnesium" });
             lii.Add(new IngotInfo() { Name = "Au", TypeName = "MyObjectBuilder_Ore/Gold" });
+            lii.Add(new IngotInfo() { Name = "U", TypeName = "MyObjectBuilder_Ore/Uranium" });
+            lii.Add(new IngotInfo() { Name = "Pt", TypeName = "MyObjectBuilder_Ore/Platinum" });
+
             lii.Add(new IngotInfo() { Name = "Ice", TypeName = "MyObjectBuilder_Ore/Ice" });
             lii.Add(new IngotInfo() { Name = "Stone", TypeName = "MyObjectBuilder_Ore/Stone" });
             return lii.ToArray();
