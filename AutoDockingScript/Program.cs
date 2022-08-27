@@ -26,9 +26,7 @@ namespace IngameScript
         readonly String BROADCAST_TAG_REQUEST = "DOCKINGLIST_REQUEST";
         readonly String UNICAST_TAG_RESPONSE = "DOCKINGLIST_RESPONSE";
         IMyBroadcastListener myBroadcastListener;
-
-        readonly int LOG_HISTORY = 20;
-        List<String> log = new List<string>();
+        private Logger _logger;
 
         public Program()
         {
@@ -38,6 +36,8 @@ namespace IngameScript
             myBroadcastListener.SetMessageCallback(BROADCAST_TAG_REQUEST);
             Me.GetSurface(0).ContentType = ContentType.TEXT_AND_IMAGE;
             Me.GetSurface(0).WriteText("Docking Script running...");
+
+            _logger = new Logger(this);
         }
 
         public void Save()
@@ -53,8 +53,8 @@ namespace IngameScript
             s = Me.GetSurface(1);
             s.ContentType = ContentType.TEXT_AND_IMAGE;
             s.WriteText("AUTO DOCKING");
-            log.Clear();
-            LogMessage("Running...");
+            _logger.Clear();
+            _logger.LogMessage("Running...");
         }
 
         public void Main(string argument, UpdateType updateSource)
@@ -67,18 +67,18 @@ namespace IngameScript
                 conns = conns.Where(c => c.Enabled && c.Status == MyShipConnectorStatus.Unconnected).ToList();
 
                 MyIGCMessage message = myBroadcastListener.AcceptMessage();
-                LogMessage("Received message with tag: " + message.Tag + "from source: " + message.Source + "with data: " + message.Data);
+                _logger.LogMessage("Received message with tag: " + message.Tag + "from source: " + message.Source + "with data: " + message.Data);
                 if (message.Tag == BROADCAST_TAG_REQUEST)
                 {
                     String connsList = GetConnectorsPositions(conns.Where(c => c.CustomName.Contains(message.Data.ToString())).ToList());
                     bool res = IGC.SendUnicastMessage(message.Source, UNICAST_TAG_RESPONSE, connsList);
                     if (res)
                     {
-                        LogMessage("Connectors list send successfully");
-                        LogMessage(connsList);
+                        _logger.LogMessage("Connectors list send successfully");
+                        _logger.LogMessage(connsList);
                     }
                     else
-                        LogMessage("Connectors list cannot be send, given endpoint is unreachable");
+                        _logger.LogMessage("Connectors list cannot be send, given endpoint is unreachable");
                 }
             }
         }
@@ -103,28 +103,6 @@ namespace IngameScript
                 connectors += connectors + "|" + connPosition;
             }
             return connectors;
-        }
-
-        void LogMessage(String message)
-        {
-            if (log.Count > LOG_HISTORY)
-                log.Remove(log.LastOrDefault());
-
-            log.Add(message);
-
-            string slog = "";
-            log.ForEach(x => slog += x + "\n");
-
-            Me.GetSurface(0).WriteText(slog);
-            try
-            {
-                var s = (GridTerminalSystem.GetBlockWithName("Cockpit") as IMyCockpit).GetSurface(0);
-                s.ContentType = ContentType.TEXT_AND_IMAGE;
-                s.FontSize = 2;
-                s.WriteText(slog);
-            }
-            catch { }
-            Echo(message);
         }
     }
 }

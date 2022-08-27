@@ -24,70 +24,13 @@ namespace IngameScript
         Color _c = new Color(255, 255, 0);
         float _fontSize = 2.5f;
         int _linesPerDisplay = 7;
-
-        private Dictionary<string, List<IMyTextPanel>> GetLcds(string tag)
-        {
-            List<IMyTextPanel> lcds = new List<IMyTextPanel>();
-            GridTerminalSystem.GetBlocksOfType<IMyTextPanel>(lcds);
-            lcds = lcds.Where(x => x.CustomName.Contains(tag)).ToList();
-            Dictionary<string, List<IMyTextPanel>> dlcds = new Dictionary<string, List<IMyTextPanel>>();
-            foreach (IMyTextPanel lcd in lcds)
-            {
-                List<IMyTextPanel> l;
-                if (dlcds.ContainsKey(lcd.CustomName))
-                    l = dlcds[lcd.CustomName];
-                else
-                {
-                    l = new List<IMyTextPanel>();
-                    dlcds.Add(lcd.CustomName, l);
-                }
-                l.Add(lcd);
-            }
-
-            return dlcds;
-        }
-
-        private void WriteToLcds(List<string> fs, string tag, int lines, Color color, float size)
-        {
-            Dictionary<string, List<IMyTextPanel>> dlcds = GetLcds(tag);
-            List<string> names = dlcds.Keys.OrderBy(x => x).ToList();
-
-            int t = 0;
-            int c = 0;
-            int i = 0;
-
-            while (fs.Count > t)
-            {
-                c = lines < fs.Count - t ? lines : (fs.Count - t);
-                List<string> part = fs.GetRange(t, c);
-                if (i >= names.Count)
-                    return;
-                foreach (var lcd in dlcds[names[i]])
-                {
-                    lcd.FontSize = size;
-                    lcd.FontColor = color;
-                    lcd.ContentType = ContentType.TEXT_AND_IMAGE;
-                    lcd.WriteText(String.Join("\n", part));
-                }
-
-                t += c;
-                i++;
-            }
-
-            while (i < names.Count)
-            {
-                foreach (var lcd in dlcds[names[i]])
-                {
-                    lcd.WriteText("");
-                }
-                i++;
-            }
-        }
+        LCDHelper _lcd;
 
         public Program()
         {
             Echo("<==Resources==>");
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
+            _lcd = new LCDHelper(this);
         }
 
         public void Save()
@@ -132,7 +75,7 @@ namespace IngameScript
             }
 
 
-            WriteToLcds(fs, "[Ingots]", _linesPerDisplay, _c, _fontSize);
+            _lcd.WriteToLcds(fs, "[Ingots]", _linesPerDisplay, _c, _fontSize);
         }
 
         void ShowOreResources(String LcdName)
@@ -167,7 +110,7 @@ namespace IngameScript
                 fs.Add(ingots[i].Text);
             }
 
-            WriteToLcds(fs, "[Ores]", _linesPerDisplay, _c, _fontSize);
+            _lcd.WriteToLcds(fs, "[Ores]", _linesPerDisplay, _c, _fontSize);
         }
 
         IngotInfo[] GetIngotInfos()

@@ -27,7 +27,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoShipPatrol", "AutoShipP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CargoCapacity", "CargoCapacity\CargoCapacity.csproj", "{45F4F5C4-19D5-4B48-882F-87E2056C2E3C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{D02ABBEB-B3C5-44E9-B2B9-8409F112E777}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{664A411F-3D26-4B76-AAD4-9469DD4242A3}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{212f72ff-ced7-40d2-be53-3534dd0b8024}*SharedItemsImports = 4
+		Shared\Shared.projitems*{3b8429d2-c922-4b63-a607-69fced5b3b77}*SharedItemsImports = 4
+		Shared\Shared.projitems*{44104442-3019-48ec-afde-a02470ab0c79}*SharedItemsImports = 4
+		Shared\Shared.projitems*{55435e82-decd-453b-a621-02e79f68e5ff}*SharedItemsImports = 4
+		Shared\Shared.projitems*{664a411f-3d26-4b76-aad4-9469dd4242a3}*SharedItemsImports = 13
+		Shared\Shared.projitems*{68bced65-2996-465d-a78a-86378637bd7a}*SharedItemsImports = 4
+		Shared\Shared.projitems*{a64a1315-2755-4c53-83f4-1303c2dc2b71}*SharedItemsImports = 4
+		Shared\Shared.projitems*{a6efc1ad-c283-46ef-870f-f9021ae4d05d}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 	EndGlobalSection
@@ -59,6 +73,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{664A411F-3D26-4B76-AAD4-9469DD4242A3} = {D02ABBEB-B3C5-44E9-B2B9-8409F112E777}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {81AE2EDF-BD2A-44E6-A22B-09CA25FCDA49}

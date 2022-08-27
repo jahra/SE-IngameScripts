@@ -31,7 +31,6 @@ namespace IngameScript
 
     partial class Program : MyGridProgram
     {
-        readonly int LOG_HISTORY = 6;
         readonly int MAX_SPEED = 50;
         readonly bool TRADER_MODE = false;
         readonly int DELAY_BETWEEN_RUNS_SECONDS = 0;
@@ -45,16 +44,17 @@ namespace IngameScript
         IMyRemoteControl remc;
         IMyRadioAntenna ant;
 
-        List<String> log = new List<string>();
         List<MyWaypointInfo> waypoints = new List<MyWaypointInfo>();
         int _direction = 0;
         int _current = 0;
         DateTime landed = DateTime.MaxValue;
         bool addMode = false;
+        private Logger _logger;
 
 
         public Program()
         {
+            _logger = new Logger(this);
             Echo("<==AutoShipPatrol==>");
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
             Init();
@@ -66,9 +66,9 @@ namespace IngameScript
                 if (MyWaypointInfo.TryParse(pos, out wp))
                     waypoints.Add(wp);
                 else
-                    LogMessage($"Failed to parse wp");
+                    _logger.LogMessage($"Failed to parse wp");
             }
-            LogMessage($"{waypoints.Count} wp loaded");
+            _logger.LogMessage($"{waypoints.Count} wp loaded");
 
 
         }
@@ -111,8 +111,8 @@ namespace IngameScript
             s = Me.GetSurface(1);
             s.ContentType = ContentType.TEXT_AND_IMAGE;
             s.WriteText("AUTO DOCKING");
-            log.Clear();
-            LogMessage("Running...");
+            _logger.Clear();
+            _logger.LogMessage("Running...");
 
         }
 
@@ -127,7 +127,7 @@ namespace IngameScript
                         remc.SetAutoPilotEnabled(false);
                         _direction = 0;
                         SwitchFlightSystems(true);
-                        LogMessage("Stopped");
+                        _logger.LogMessage("Stopped");
                         return;
                     case "go":
                         doors?.ForEach(x => x.CloseDoor());
@@ -155,7 +155,7 @@ namespace IngameScript
                         RunDock2();
                         return;
                     default:
-                        LogMessage("Unknown arg");
+                        _logger.LogMessage("Unknown arg");
                         break;
                 }
 
@@ -167,10 +167,10 @@ namespace IngameScript
                     _direction = 0;
                     landed = DateTime.UtcNow;
                     doors?.ForEach(x => x.OpenDoor());
-                    LogMessage("End");
+                    _logger.LogMessage("End");
                     return;
                 }
-                LogMessage($"GO: {waypoints[_current].Name}");
+                _logger.LogMessage($"GO: {waypoints[_current].Name}");
                 SetupRemoteControl(waypoints[_current], _current == 0 || _current == (waypoints.Count - 1) ? 2 : MAX_SPEED, conn.Orientation.Forward);
                 return;
             }
@@ -251,39 +251,7 @@ namespace IngameScript
 
             MyWaypointInfo position = new MyWaypointInfo(positions.Length.ToString(), remc.GetPosition());
             Me.CustomData += position.ToString() + "\r\n";
-            LogMessage($"WP added: {positions.Length}");
-        }
-
-        void LogMessage(String message)
-        {
-            if (log.Count > LOG_HISTORY)
-                log.Remove(log.LastOrDefault());
-
-            log.Add(message);
-
-            string slog = "";
-            log.ForEach(x => slog += x + "\n");
-
-            Me.GetSurface(0).WriteText(slog);
-            try
-            {
-                var s = (GridTerminalSystem.GetBlockWithName("Cockpit") as IMyCockpit).GetSurface(0);
-                s.ContentType = ContentType.TEXT_AND_IMAGE;
-                s.FontSize = 2;
-                s.WriteText(slog);
-            }
-            catch { }
-
-            try
-            {
-                var s = (GridTerminalSystem.GetBlockWithName("LCDLog") as IMyTextPanel);
-                s.ContentType = ContentType.TEXT_AND_IMAGE;
-                s.FontSize = 1.5f;
-                s.WriteText(slog);
-            }
-            catch { }
-
-            Echo(message);
+            _logger.LogMessage($"WP added: {positions.Length}");
         }
 
         void SetupRemoteControl(MyWaypointInfo coord, float speedLimit = 15, Base6Directions.Direction direction = Base6Directions.Direction.Forward)
