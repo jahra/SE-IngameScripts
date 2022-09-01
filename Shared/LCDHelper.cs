@@ -73,6 +73,7 @@ namespace IngameScript
                         lcd.FontSize = size;
                         lcd.FontColor = color;
                         lcd.ContentType = ContentType.TEXT_AND_IMAGE;
+                        lcd.Font = "Monospace";
                         lcd.WriteText(String.Join("\n", part));
                     }
 

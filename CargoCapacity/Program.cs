@@ -26,6 +26,7 @@ namespace IngameScript
         const bool SHOW_ONLY_MY_GRID = true;
         const string LCD_TAG = "LCDCargo";
         const int COCKPIT_DISPLAY_INDEX = -1;
+        readonly bool CARGO_CONTAINER_ONLY = false;
 
         public void Save() { }
 
@@ -33,14 +34,19 @@ namespace IngameScript
         IMyTextPanel lcd;
         IMyTextSurface cockpit;
 
+        Helper _helper;
+        Graphics _graphics = new Graphics();
+
         public Program()
         {
+            _helper = new Helper(this);
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
             cargos = new List<IMyTerminalBlock>();
 
             List<IMyTextPanel> lcds = new List<IMyTextPanel>();
             GridTerminalSystem.GetBlocksOfType(lcds);
             lcd = lcds?.Where(x => Me.CubeGrid == x.CubeGrid && x.CustomName.Contains(LCD_TAG)).FirstOrDefault();
+            lcd.Font = "Monospace";
 
             GridTerminalSystem.GetBlocksOfType<IMyEntity>(cargos);
             var cargosSubGrid = new List<IMyTerminalBlock>();
@@ -51,15 +57,23 @@ namespace IngameScript
                 GridTerminalSystem.GetBlocksOfType<IMyCockpit>(cockpits);
                 cockpit = cockpits.Where(x => Me.CubeGrid == x.CubeGrid && x.SurfaceCount > 0).FirstOrDefault()?.GetSurface(COCKPIT_DISPLAY_INDEX);
                 cockpit.ContentType = ContentType.TEXT_AND_IMAGE;
+                cockpit.Font = "Monospace";
             }
         }
 
         public void Main(string argument, UpdateType updateSource)
         {
-            if (SHOW_ONLY_MY_GRID)
-                cargos = cargos.Where(c => Me.CubeGrid == c.CubeGrid && c.HasInventory).ToList();
+            if (CARGO_CONTAINER_ONLY)
+            {
+                cargos = _helper.GetBlocks<IMyCargoContainer>().ToList<IMyTerminalBlock>();
+            }
             else
-                cargos = cargos.Where(c => c.HasInventory).ToList();
+            {
+                if (SHOW_ONLY_MY_GRID)
+                    cargos = cargos.Where(c => Me.CubeGrid == c.CubeGrid && c.HasInventory).ToList();
+                else
+                    cargos = cargos.Where(c => c.HasInventory).ToList();
+            }
 
             float used = 0.0f;
             float max = 0.0f;
@@ -77,7 +91,7 @@ namespace IngameScript
             }
 
             float usedPerc = (100 * used) / max;
-            displayText = $"{used.ToString("### ### ### ##0.##")} /{max.ToString("### ### ### ##0.##")}\nUsed: {usedPerc.ToString("### ### ### ##0.##")}%\n";
+            displayText = $"{used.ToString("### ### ### ##0.##")} /{max.ToString("### ### ### ##0.##")}\nUsed: {_graphics.GetProgressBar(usedPerc / 100)}{usedPerc.ToString("### ### ### ##0.##")}%\n";
 
 
             displayText += SHOW_INVENTORY_ITEMS ? GetInventoryItems(cargos) : "";

@@ -22,11 +22,23 @@ namespace IngameScript
     partial class Program : MyGridProgram
     {
         LCDHelper _lcd;
+        Graphics _graphics = new Graphics();
+        Helper _helper;
+
+        const string HYDROGEN_TAG = "[H2-Stat]";
+
+        List<IMyGasTank> gasTanks;
+        List<IMyOxygenTank> o2Tanks;
+        Color _color = new Color(100, 255, 255);
+
         public Program()
         {
             Echo("<==Power==>");
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
             _lcd = new LCDHelper(this);
+            _helper = new Helper(this);
+            gasTanks = _helper.GetBlocks<IMyGasTank>();
+            o2Tanks = _helper.GetBlocks<IMyOxygenTank>();
         }
 
         public void Main(string argument, UpdateType updateSource)
@@ -66,12 +78,12 @@ namespace IngameScript
 
             foreach (var g in grids.Keys)
             {
-                fs.Add($"{g.CustomName}: {(grids[g].Current * 1000).ToString("0")} kWh / {(grids[g].Max * 1000).ToString("0")} kWh\t {grids[g].Perc.ToString("F1")}%");
+                string s = $"{(grids[g].Current * 1000).ToString("0")} kWh / {(grids[g].Max * 1000).ToString("0")} kWh\t";
+                fs.Add($"{g.CustomName} {_graphics.GetProgressBar(grids[g].Perc / 100)} {grids[g].Perc.ToString("F1")}%");
             }
             //string s = String.Join("\n",fs);   
             //lcd.WriteText(s);
-            Color c = new Color(100, 255, 255);
-            _lcd.WriteToLcds(fs, "[BatStat]", 11, c, 1.5f);
+            _lcd.WriteToLcds(fs, "[BatStat]", 11, _color, 1.5f);
 
             fs.Clear();
 
@@ -86,7 +98,45 @@ namespace IngameScript
 
             //s = String.Join("\n",fs);
             //lcd1.WriteText(s);
-            _lcd.WriteToLcds(fs, "[BatStat1]", 11, c, 1.5f);
+            _lcd.WriteToLcds(fs, "[BatStat1]", 11, _color, 1.5f);
+
+            ShowH2O2Stats();
+        }
+
+        public void ShowH2O2Stats()
+        {
+            List<string> lines = new List<string>();
+
+            float o2Filled = 0;
+            float h2Filled = 0;
+            int o2s = 0;
+            int h2s = 0;
+
+            foreach (IMyGasTank g in gasTanks)
+            {
+                if (g.DefinitionDisplayNameText.ToLower().Contains("hydrogen"))
+                {
+                    h2Filled += (float)g.FilledRatio;
+                    h2s++;
+                }
+                else
+                {
+                    o2Filled += (float)g.FilledRatio;
+                    o2s++;
+                }
+            }
+            float perc = o2Filled / gasTanks.Count;
+            string bar = _graphics.GetProgressBar(perc);
+
+            lines.Add(_graphics.GetProgressBar(h2Filled / h2s, "Hydrogen", true));
+            lines.Add(_graphics.GetProgressBar(o2Filled / o2s, "Oxygen", true));
+            //lines.Add($"H2    {(perc * 100).ToString("F1")}%");
+            //lines.Add(bar);
+
+            o2Filled = 0;
+
+
+            _lcd.WriteToLcds(lines, HYDROGEN_TAG, 11, _color, 1.5f);
         }
 
         float AddSumPowerOutput(List<IMyPowerProducer> pps, List<string> fs, string name)
