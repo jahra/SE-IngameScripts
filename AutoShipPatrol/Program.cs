@@ -34,6 +34,7 @@ namespace IngameScript
         readonly int MAX_SPEED = 50;
         readonly bool TRADER_MODE = false;
         readonly int DELAY_BETWEEN_RUNS_SECONDS = 0;
+        readonly Base6Directions.Direction GO_DIRECTION = Base6Directions.Direction.Forward;
 
 
         List<IMyBatteryBlock> batts = new List<IMyBatteryBlock>();
@@ -47,15 +48,19 @@ namespace IngameScript
         List<MyWaypointInfo> waypoints = new List<MyWaypointInfo>();
         int _direction = 0;
         int _current = 0;
+        bool _isStopped = true;
         DateTime landed = DateTime.MaxValue;
         bool addMode = false;
         private Logger _logger;
-
+        private Helper _helper;
 
         public Program()
         {
-            _logger = new Logger(this);
             Echo("<==AutoShipPatrol==>");
+
+            _helper = new Helper(this);
+            _logger = new Logger(this);
+
             Runtime.UpdateFrequency = UpdateFrequency.Update100;
             Init();
 
@@ -69,48 +74,24 @@ namespace IngameScript
                     _logger.LogMessage($"Failed to parse wp");
             }
             _logger.LogMessage($"{waypoints.Count} wp loaded");
-
-
         }
 
         void Init()
         {
-            GridTerminalSystem.GetBlocksOfType<IMyBatteryBlock>(batts);
-            batts = batts.Where(b => Me.CubeGrid == b.CubeGrid).ToList();
-
-            GridTerminalSystem.GetBlocksOfType<IMyGasTank>(gasTanks);
-            gasTanks = gasTanks.Where(g => Me.CubeGrid == g.CubeGrid).ToList();
-
-            GridTerminalSystem.GetBlocksOfType<IMyThrust>(thrusters);
-            thrusters = thrusters.Where(t => Me.CubeGrid == t.CubeGrid).ToList();
-
-            GridTerminalSystem.GetBlocksOfType<IMyDoor>(doors);
-            doors = doors.Where(t => Me.CubeGrid == t.CubeGrid).ToList();
-
-            List<IMyShipConnector> conns = new List<IMyShipConnector>();
-            GridTerminalSystem.GetBlocksOfType<IMyShipConnector>(conns);
-            conns = conns.Where(c => Me.CubeGrid == c.CubeGrid).ToList();
-            conn = conns.First();//Or specify connector on next line
-            //conn = GridTerminalSystem.GetBlockWithName("Connector 4") as IMyShipConnector;
-
-            //Get RemoteControl
-            List<IMyRemoteControl> rems = new List<IMyRemoteControl>();
-            GridTerminalSystem.GetBlocksOfType<IMyRemoteControl>(rems);
-            rems = rems.Where(r => Me.CubeGrid == r.CubeGrid).ToList();
-            remc = rems.First();//Or setup by name
-                                //IMyRemoteControl remc = GridTerminalSystem.GetBlockWithName("Remote Control") as IMyRemoteControl;
-
-            List<IMyRadioAntenna> ants = new List<IMyRadioAntenna>();
-            GridTerminalSystem.GetBlocksOfType<IMyRadioAntenna>(ants);
-            ants = ants.Where(r => Me.CubeGrid == r.CubeGrid).ToList();
-            ant = ants.First();//Or setup by name
+            batts = _helper.GetBlocks<IMyBatteryBlock>();
+            gasTanks = _helper.GetBlocks<IMyGasTank>();
+            thrusters = _helper.GetBlocks<IMyThrust>();
+            doors = _helper.GetBlocks<IMyDoor>();
+            conn = _helper.GetBlock<IMyShipConnector>();
+            remc = _helper.GetBlock<IMyRemoteControl>();
+            ant = _helper.GetBlock<IMyRadioAntenna>();
 
             var s = Me.GetSurface(0);
             s.FontSize = 2;
             s.ContentType = ContentType.TEXT_AND_IMAGE;
             s = Me.GetSurface(1);
             s.ContentType = ContentType.TEXT_AND_IMAGE;
-            s.WriteText("AUTO DOCKING");
+
             _logger.Clear();
             _logger.LogMessage("Running...");
 
@@ -124,17 +105,27 @@ namespace IngameScript
                 switch (argument.ToLower())
                 {
                     case "stop":
+                        _isStopped = true;
                         remc.SetAutoPilotEnabled(false);
                         _direction = 0;
                         SwitchFlightSystems(true);
                         _logger.LogMessage("Stopped");
                         return;
                     case "go":
+                        _isStopped = false;
                         doors?.ForEach(x => x.CloseDoor());
                         addMode = false;
                         Go();
                         return;
+                    case "dock":
+                        _isStopped = true;
+                        doors?.ForEach(x => x.OpenDoor());
+                        addMode = false;
+                        conn.Connect();
+                        SwitchFlightSystems(!(conn.Status == MyShipConnectorStatus.Connected));
+                        return;
                     case "undock":
+                        _isStopped = true;
                         addMode = true;
                         SwitchFlightSystems(true);
                         conn.Disconnect();
@@ -145,11 +136,13 @@ namespace IngameScript
                         AddGPSPosition();
                         break;
                     case "dock1":
+                        _isStopped = true;
                         doors?.ForEach(x => x.CloseDoor());
                         addMode = false;
                         RunDock1();
                         return;
                     case "dock2":
+                        _isStopped = true;
                         doors?.ForEach(x => x.CloseDoor());
                         addMode = false;
                         RunDock2();
@@ -171,7 +164,7 @@ namespace IngameScript
                     return;
                 }
                 _logger.LogMessage($"GO: {waypoints[_current].Name}");
-                SetupRemoteControl(waypoints[_current], _current == 0 || _current == (waypoints.Count - 1) ? 2 : MAX_SPEED, conn.Orientation.Forward);
+                SetupRemoteControl(waypoints[_current], _current == 0 || _current == (waypoints.Count - 1) ? 2 : MAX_SPEED);
                 return;
             }
 
@@ -188,7 +181,7 @@ namespace IngameScript
                 else
                     SwitchFlightSystems(false);
 
-            if (DELAY_BETWEEN_RUNS_SECONDS != 0 && (DateTime.UtcNow - landed).TotalSeconds > DELAY_BETWEEN_RUNS_SECONDS)
+            if (!_isStopped && DELAY_BETWEEN_RUNS_SECONDS != 0 && (DateTime.UtcNow - landed).TotalSeconds > DELAY_BETWEEN_RUNS_SECONDS)
             {
                 landed = DateTime.MaxValue;
                 Go();
@@ -234,7 +227,7 @@ namespace IngameScript
             _current += _direction;
             SwitchFlightSystems(true);
             conn.Disconnect();
-            SetupRemoteControl(waypoints[_current]);
+            SetupRemoteControl(waypoints[_current], 15, GO_DIRECTION);
         }
 
         private void SwitchFlightSystems(bool enabled)
@@ -242,7 +235,8 @@ namespace IngameScript
             batts.ForEach(b => b.ChargeMode = enabled ? ChargeMode.Auto : ChargeMode.Recharge);
             gasTanks.ForEach(g => g.Enabled = enabled);
             thrusters.ForEach(t => t.Enabled = enabled);
-            ant.Enabled = enabled;
+            if (ant != null)
+                ant.Enabled = enabled;
         }
 
         private void AddGPSPosition()
@@ -261,7 +255,7 @@ namespace IngameScript
 
             //remc.SetDockingMode(true);//todo: test it//precize mod?
 
-            remc.Direction = Base6Directions.Direction.Forward;
+            remc.Direction = direction;
             //LogMessage(direction.ToString());
 
 
