@@ -28,7 +28,7 @@ namespace IngameScript
         const string HYDROGEN_TAG = "[H2-Stat]";
 
         List<IMyGasTank> gasTanks;
-        List<IMyOxygenTank> o2Tanks;
+        List<IMyGasTank> o2Tanks;
         Color _color = new Color(100, 255, 255);
 
         public Program()
@@ -38,7 +38,7 @@ namespace IngameScript
             _lcd = new LCDHelper(this);
             _helper = new Helper(this);
             gasTanks = _helper.GetBlocks<IMyGasTank>();
-            o2Tanks = _helper.GetBlocks<IMyOxygenTank>();
+            o2Tanks = _helper.GetBlocks<IMyGasTank>();
         }
 
         public void Main(string argument, UpdateType updateSource)
