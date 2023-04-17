@@ -46,7 +46,11 @@ namespace IngameScript
             List<IMyTextPanel> lcds = new List<IMyTextPanel>();
             GridTerminalSystem.GetBlocksOfType(lcds);
             lcd = lcds?.Where(x => Me.CubeGrid == x.CubeGrid && x.CustomName.Contains(LCD_TAG)).FirstOrDefault();
-            lcd.Font = "Monospace";
+            if(lcd != null)
+			{
+                lcd.Font = "Monospace";
+                lcd.ContentType = ContentType.TEXT_AND_IMAGE;
+			}
 
             GridTerminalSystem.GetBlocksOfType<IMyEntity>(cargos);
             var cargosSubGrid = new List<IMyTerminalBlock>();

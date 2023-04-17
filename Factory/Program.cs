@@ -28,7 +28,6 @@ namespace IngameScript
         int _linesPerDisplay = 7;
         LCDHelper _lcd;
 
-
         public Program()
         {
             Echo("<==Factory==>");
@@ -90,8 +89,6 @@ namespace IngameScript
                         ass.AddQueueItem(m, ingots[i].Needed);
                 }
             }
-
-
             _lcd.WriteToLcds(fs, "[Factory]", _linesPerDisplay, _c, _fontSize);
         }
 
@@ -118,16 +115,16 @@ namespace IngameScript
             lci.Add(new ComponentInfo() { Name = "ConstComp:      ", TypeName = "MyObjectBuilder_Component/Construction", Desired = 2000, BlueprintName = "MyObjectBuilder_BlueprintDefinition/ConstructionComponent" });
             lci.Add(new ComponentInfo() { Name = "Ammo:           ", TypeName = "MyObjectBuilder_AmmoMagazine/NATO_25x184mm", Desired = 300, BlueprintName = "MyObjectBuilder_BlueprintDefinition/NATO_25x184mmMagazine" });
             lci.Add(new ComponentInfo() { Name = "Thruster comp:  ", TypeName = "MyObjectBuilder_Component/Thrust", Desired = 100, BlueprintName = "MyObjectBuilder_BlueprintDefinition/ThrustComponent" });
-            lci.Add(new ComponentInfo() { Name = "Explosives:  ", TypeName = "MyObjectBuilder_Component/Explosives", Desired = 200, BlueprintName = "MyObjectBuilder_BlueprintDefinition/ExplosivesComponent" });
-            lci.Add(new ComponentInfo() { Name = "Medical Comp:  ", TypeName = "MyObjectBuilder_BlueprintDefinition/MedicalComponent", Desired = 10, BlueprintName = "MyObjectBuilder_BlueprintDefinition/MedicalComponent" });
+            lci.Add(new ComponentInfo() { Name = "Explosives:     ", TypeName = "MyObjectBuilder_Component/Explosives", Desired = 200, BlueprintName = "MyObjectBuilder_BlueprintDefinition/ExplosivesComponent" });
+            lci.Add(new ComponentInfo() { Name = "Medical Comp:   ", TypeName = "MyObjectBuilder_Component/Medical", Desired = 10, BlueprintName = "MyObjectBuilder_BlueprintDefinition/MedicalComponent" });
 
-            lci.Add(new ComponentInfo() { Name = "Enhanced Welder:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/Welder2Item", Desired = 2, BlueprintName = "MyObjectBuilder_BlueprintDefinition/Welder2" });
-            lci.Add(new ComponentInfo() { Name = "Enhanced Grinder:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/AngleGrinder2Item", Desired = 2, BlueprintName = "MyObjectBuilder_BlueprintDefinition/AngleGrinder2" });
-            lci.Add(new ComponentInfo() { Name = "Enhanced Hand Drill:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/HandDrill2Item", Desired = 2, BlueprintName = "MyObjectBuilder_BlueprintDefinition/HandDrill2" });
+            lci.Add(new ComponentInfo() { Name = "Enh. Welder:    ", TypeName = "MyObjectBuilder_PhysicalGunObject/Welder2Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/Welder2" });
+            lci.Add(new ComponentInfo() { Name = "Enh. Grinder:   ", TypeName = "MyObjectBuilder_PhysicalGunObject/AngleGrinder2Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/AngleGrinder2" });
+            lci.Add(new ComponentInfo() { Name = "Enh. Drill:     ", TypeName = "MyObjectBuilder_PhysicalGunObject/HandDrill2Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/HandDrill2" });
 
-            lci.Add(new ComponentInfo() { Name = "Elite Welder:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/Welder3Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/Welder3" });
-            lci.Add(new ComponentInfo() { Name = "Elite Grinder:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/AngleGrinder3Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/AngleGrinder3" });
-            lci.Add(new ComponentInfo() { Name = "Elite Hand Drill:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/HandDrill3Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/HandDrill3" });
+            lci.Add(new ComponentInfo() { Name = "Elite Welder:   ", TypeName = "MyObjectBuilder_PhysicalGunObject/Welder4Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/Welder4" });
+            lci.Add(new ComponentInfo() { Name = "Elite Grinder:  ", TypeName = "MyObjectBuilder_PhysicalGunObject/AngleGrinder4Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/AngleGrinder4" });
+            lci.Add(new ComponentInfo() { Name = "Elite Drill:    ", TypeName = "MyObjectBuilder_PhysicalGunObject/HandDrill4Item", Desired = 1, BlueprintName = "MyObjectBuilder_BlueprintDefinition/HandDrill4" });
             return lci.ToArray();
         }
 
@@ -142,6 +139,5 @@ namespace IngameScript
 
             public string Text { get { return Name + Amount / 1000000 + "/" + Desired; } }
         }
-
     }
 }
